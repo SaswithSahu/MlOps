@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 import joblib
 import yaml
 import os
+import subprocess  # <-- added for git commit
 
 class ModelTrainer:
     def __init__(self, train_path, model_path, params):
@@ -28,19 +29,30 @@ class ModelTrainer:
                 random_state=42
             )
 
+        # -------------------------------
+        # Get current git commit hash dynamically
+        # -------------------------------
+        git_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"]
+        ).decode("utf-8").strip()
+
         mlflow.set_experiment("Iris Classification")
         with mlflow.start_run():
             model.fit(X, y)
 
-            # Log params
+            # Log parameters
             mlflow.log_param("model", self.params["model"])
             if self.params["model"] == "random_forest":
                 mlflow.log_param("n_estimators", self.params["n_estimators"])
                 mlflow.log_param("max_depth", self.params["max_depth"])
 
-            # Log model
+            # Log git/DVC commit dynamically
+            mlflow.log_param("dvc_commit", git_commit)
+
+            # Log model artifact
             mlflow.sklearn.log_model(model, "model")
 
+        # Save local model
         os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
         joblib.dump(model, self.model_path)
         print(f"Model saved at {self.model_path}")

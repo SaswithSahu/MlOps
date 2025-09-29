@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import os
+import mlflow
+import subprocess  # to get git commit
 
 class DataPreprocessing:
     def __init__(self, input_path, train_path, test_path, test_size=0.2):
@@ -15,7 +17,9 @@ class DataPreprocessing:
         # No missing values in Iris, but let's ensure
         df = df.dropna()
 
-        train, test = train_test_split(df, test_size=self.test_size, random_state=42, stratify=df["target"])
+        train, test = train_test_split(
+            df, test_size=self.test_size, random_state=42, stratify=df["target"]
+        )
 
         os.makedirs(os.path.dirname(self.train_path), exist_ok=True)
         os.makedirs(os.path.dirname(self.test_path), exist_ok=True)
@@ -23,6 +27,22 @@ class DataPreprocessing:
         train.to_csv(self.train_path, index=False)
         test.to_csv(self.test_path, index=False)
         print(f"Train/Test saved: {self.train_path}, {self.test_path}")
+
+        # -------------------------------
+        # Log Git/DVC commit dynamically to MLflow
+        # -------------------------------
+        git_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"]
+        ).decode("utf-8").strip()
+
+        mlflow.set_experiment("Iris Preprocessing")
+        with mlflow.start_run():
+            mlflow.log_param("dvc_commit", git_commit)
+            mlflow.log_param("train_rows", len(train))
+            mlflow.log_param("test_rows", len(test))
+            mlflow.log_artifact(self.train_path)
+            mlflow.log_artifact(self.test_path)
+            print(f"Preprocessing run logged in MLflow with commit: {git_commit}")
 
 if __name__ == "__main__":
     input_path = "data/raw/iris.csv"
