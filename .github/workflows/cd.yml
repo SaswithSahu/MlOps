@@ -1,0 +1,38 @@
+name: Iris MLOps CD
+
+on:
+  workflow_run:
+    workflows: ["Iris MLOps CI"]
+    types:
+      - completed
+
+jobs:
+  deploy_model:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install dvc mlflow scikit-learn pandas fastapi uvicorn
+
+      - name: Pull DVC outputs
+        run: |
+          dvc pull
+
+      - name: Run full pipeline
+        run: |
+          dvc repro
+
+      - name: Deploy model as API
+        run: |
+          # Example: start FastAPI server (or deployment script)
+          uvicorn src.api:app --host 0.0.0.0 --port 8000

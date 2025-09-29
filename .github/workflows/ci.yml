@@ -1,0 +1,33 @@
+name: Iris MLOps CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install dvc mlflow scikit-learn pandas
+
+      - name: Run unit tests
+        run: |
+          pytest tests/
+
+      - name: Test DVC pipeline (dry run)
+        run: |
+          dvc pull  # Pull previous outputs
+          dvc repro --dry
