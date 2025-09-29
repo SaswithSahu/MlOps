@@ -1,0 +1,4 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = C:\Users\saswith sahu\Desktop\MLOPS\END-TO-END-MLops\dvc_store

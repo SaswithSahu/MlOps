@@ -1,0 +1,32 @@
+stages:
+  data_ingestion:
+    cmd: python src/1_data_ingestion.py
+    deps:
+      - src/1_data_ingestion.py
+    outs:
+      - data/raw/iris.csv
+
+  data_preprocessing:
+    cmd: python src/2_data_preprocessing.py
+    deps:
+      - src/2_data_preprocessing.py
+      - data/raw/iris.csv
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+
+  model_training:
+    cmd: python src/3_model_training.py
+    deps:
+      - src/3_model_training.py
+      - data/processed/train.csv
+      - params.yaml
+    outs:
+      - models/model.pkl
+
+  model_evaluation:
+    cmd: python src/4_model_evaluation.py
+    deps:
+      - src/4_model_evaluation.py
+      - data/processed/test.csv
+      - models/model.pkl

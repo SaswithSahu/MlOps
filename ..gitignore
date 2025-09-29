@@ -1,0 +1,30 @@
+# DVC cache and temp files
+.dvc/cache/
+*.dvc
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# MLflow experiment logs
+mlruns/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Optional: data & models tracked by DVC (Git ignores actual content)
+data/
+models/
+
+dvc_store/
