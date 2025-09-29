@@ -2,7 +2,7 @@ import pandas as pd
 import tempfile
 import os
 import joblib
-from src.3_model_training import ModelTrainer
+from src.model_training import ModelTrainer
 
 def test_model_training_creates_model(tmp_path):
     # Create a small sample training CSV

@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from src.2_data_preprocessing import DataPreprocessing
+from src.data_preprocessing import DataPreprocessing
 
 def test_preprocessing_creates_files(tmp_path):
     # Create a small sample CSV
